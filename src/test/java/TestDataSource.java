@@ -5,6 +5,7 @@ import com.googlecode.charts4j.Slice;
 import kz.techsolutions.bot.api.*;
 import kz.techsolutions.bot.api.dto.*;
 import kz.techsolutions.bot.app.BotApplication;
+import kz.techsolutions.bot.helper.CategoryHelper;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -226,6 +227,12 @@ public class TestDataSource {
         currencyDaoService.getCurrencyDtoList();
         List<CurrencyDTO> currencyDtoList = currencyDaoService.getCurrencyDtoList();
         log.info("ok");
+    }
+
+    @Test
+    public void test() {
+        CategoryDTO categoryDTO = CategoryHelper.findCategoryDtoById(categoryDaoService.getAllCategories(), 2l);
+
     }
 
     private SubcategoryDTO getSubcategoryDTOByName(List<SubcategoryDTO> subcategoryList, Subcategory subcategory) {

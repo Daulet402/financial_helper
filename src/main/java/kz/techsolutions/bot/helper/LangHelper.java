@@ -60,4 +60,15 @@ public class LangHelper {
         }
         return defaultResult;
     }
+
+    public static Language getLangByUserInput(String chosenLang) {
+        if (chosenLang.contains("Ru")) {
+            return Language.RUS;
+        } else if (chosenLang.contains("En")) {
+            return Language.ENG;
+        } else if (chosenLang.contains("Kk")) {
+            return Language.KK;
+        }
+        return null;
+    }
 }
