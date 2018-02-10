@@ -20,7 +20,7 @@ public class DateTimeUtils {
         return Objects.nonNull(timestamp) ? timestamp.toLocalDateTime() : null;
     }
 
-    public static LocalDateTime parseLocalDateTimeInternal(String toParse, String pattern) {
+    public static LocalDateTime parseLocalDateTime(String toParse, String pattern) {
         if (StringUtils.isEmpty(toParse) || StringUtils.isEmpty(pattern))
             return null;
 

@@ -210,8 +210,8 @@ public class BotServiceImpl implements BotService {
                     if (timeRange.length != 2) {
                         sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.INVALID_TIME_ERROR_TEXT)));
                     } else {
-                        LocalDateTime startTime = DateTimeUtils.parseLocalDateTimeInternal(timeRange[0], botConstants.getDateTimePattern());
-                        LocalDateTime endTime = DateTimeUtils.parseLocalDateTimeInternal(timeRange[1], botConstants.getDateTimePattern());
+                        LocalDateTime startTime = DateTimeUtils.parseLocalDateTime(timeRange[0], botConstants.getDateTimePattern());
+                        LocalDateTime endTime = DateTimeUtils.parseLocalDateTime(timeRange[1], botConstants.getDateTimePattern());
                         List<FinancialControlDTO> financialControlDtoList = financialControlDaoService.getFcDTOListInDateRangeByСategory(personDTO.getId(), startTime, endTime);
                         if (CollectionUtils.isEmpty(financialControlDtoList)) {
                             sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.NO_RECORDS_FOUND)));
@@ -242,8 +242,8 @@ public class BotServiceImpl implements BotService {
                     if (timeRange.length != 2) {
                         sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.INVALID_TIME_ERROR_TEXT)));
                     } else {
-                        LocalDateTime startTime = DateTimeUtils.parseLocalDateTimeInternal(timeRange[0], botConstants.getDateTimePattern());
-                        LocalDateTime endTime = DateTimeUtils.parseLocalDateTimeInternal(timeRange[1], botConstants.getDateTimePattern());
+                        LocalDateTime startTime = DateTimeUtils.parseLocalDateTime(timeRange[0], botConstants.getDateTimePattern());
+                        LocalDateTime endTime = DateTimeUtils.parseLocalDateTime(timeRange[1], botConstants.getDateTimePattern());
                         List<FinancialControlDTO> financialControlDtoList = financialControlDaoService.getFcDTOListInDateRangeBySubcategory(personDTO.getId(), startTime, endTime);
                         if (CollectionUtils.isEmpty(financialControlDtoList)) {
                             sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.NO_RECORDS_FOUND)));
@@ -274,8 +274,8 @@ public class BotServiceImpl implements BotService {
                     if (timeRange.length != 2) {
                         sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.INVALID_TIME_ERROR_TEXT)));
                     } else {
-                        LocalDateTime startTime = DateTimeUtils.parseLocalDateTimeInternal(timeRange[0], botConstants.getDateTimePattern());
-                        LocalDateTime endTime = DateTimeUtils.parseLocalDateTimeInternal(timeRange[1], botConstants.getDateTimePattern());
+                        LocalDateTime startTime = DateTimeUtils.parseLocalDateTime(timeRange[0], botConstants.getDateTimePattern());
+                        LocalDateTime endTime = DateTimeUtils.parseLocalDateTime(timeRange[1], botConstants.getDateTimePattern());
                         List<FinancialControlDTO> financialControlDtoList = financialControlDaoService.getFcDTOListInDateRange(personDTO.getId(), startTime, endTime);
                         if (CollectionUtils.isEmpty(financialControlDtoList)) {
                             sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.NO_RECORDS_FOUND)));
