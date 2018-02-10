@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import kz.techsolutions.bot.api.TextService;
 import kz.techsolutions.bot.api.dto.Text;
 import kz.techsolutions.bot.api.dto.TextDTO;
-import kz.techsolutions.bot.api.mapper.TextDTOMapper;
+import kz.techsolutions.bot.mapper.TextDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;

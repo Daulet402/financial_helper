@@ -1,4 +1,4 @@
-package kz.techsolutions.bot.api.mapper;
+package kz.techsolutions.bot.mapper;
 
 import kz.techsolutions.bot.api.dto.CurrencyDTO;
 import org.springframework.jdbc.core.RowMapper;

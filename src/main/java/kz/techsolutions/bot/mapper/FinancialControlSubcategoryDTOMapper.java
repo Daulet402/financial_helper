@@ -1,7 +1,7 @@
-package kz.techsolutions.bot.api.mapper;
+package kz.techsolutions.bot.mapper;
 
-import kz.techsolutions.bot.api.dto.CategoryDTO;
 import kz.techsolutions.bot.api.dto.FinancialControlDTO;
+import kz.techsolutions.bot.api.dto.SubcategoryDTO;
 import kz.techsolutions.bot.helper.CategoryHelper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,16 +15,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class FinancialControlCategoryDTOMapper implements RowMapper {
+public class FinancialControlSubcategoryDTOMapper implements RowMapper {
 
-    private List<CategoryDTO> categoryDtoList;
+    private List<SubcategoryDTO> subcategoryDtoList;
 
     @Override
-    public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public FinancialControlDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
         FinancialControlDTO financialControlDTO = new FinancialControlDTO();
         financialControlDTO.setAmount(rs.getDouble("sum"));
-        financialControlDTO.setCategoryDTO(
-                CategoryHelper.findCategoryDtoById(categoryDtoList, rs.getLong("categoryId"))
+        financialControlDTO.setSubcategoryDTO(
+                CategoryHelper.findSubcategoryDtoById(subcategoryDtoList, rs.getLong("subcategoryid"))
         );
         return financialControlDTO;
     }

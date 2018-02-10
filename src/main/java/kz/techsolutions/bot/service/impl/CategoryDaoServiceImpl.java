@@ -3,15 +3,14 @@ package kz.techsolutions.bot.service.impl;
 import kz.techsolutions.bot.api.CategoryDaoService;
 import kz.techsolutions.bot.api.dto.CategoryDTO;
 import kz.techsolutions.bot.api.dto.SubcategoryDTO;
-import kz.techsolutions.bot.api.mapper.CategoryDTOMapper;
-import kz.techsolutions.bot.api.mapper.SubcategoryDTOMapper;
+import kz.techsolutions.bot.mapper.CategoryDTOMapper;
+import kz.techsolutions.bot.mapper.SubcategoryDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Objects;
 
 @Component
 public class CategoryDaoServiceImpl implements CategoryDaoService {

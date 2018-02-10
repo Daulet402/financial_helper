@@ -2,7 +2,7 @@ package kz.techsolutions.bot.service.impl;
 
 import kz.techsolutions.bot.api.CurrencyDaoService;
 import kz.techsolutions.bot.api.dto.CurrencyDTO;
-import kz.techsolutions.bot.api.mapper.CurrencyDTOMapper;
+import kz.techsolutions.bot.mapper.CurrencyDTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
