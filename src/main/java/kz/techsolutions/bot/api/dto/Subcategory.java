@@ -69,7 +69,8 @@ public enum Subcategory {
     DEBT(71l),
     CORPORATE(72l),
     HANG_OUT(73l),
-    WORK_EVENT(67l);
+    WORK_EVENT(67l),
+    INTO_FAMILY_BUDGET(74l);
 
     @Getter
     private Long id;
