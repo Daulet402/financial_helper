@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
@@ -24,8 +25,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class BotServiceImpl implements BotService {
@@ -68,7 +71,6 @@ public class BotServiceImpl implements BotService {
                         update.getMessage().getFrom().getUserName() : null;
                 String text = Objects.nonNull(update.getMessage().getText()) ? update.getMessage().getText() : "";
                 log.info(String.format("text: %s from: %s", text, username));
-
                 PersonDTO personDTO = financialControlDaoService.getPersonByUsername(username);
                 if (Objects.isNull(personDTO)) {
                     personDTO = new PersonDTO();
@@ -76,19 +78,12 @@ public class BotServiceImpl implements BotService {
                     personDTO.setLanguage(Language.RUS);
                     financialControlDaoService.addPerson(personDTO);
                 }
-
                 Optional<CategoryDTO> categoryOptional = CategoryHelper.getCategoryByUserInputText(
                         categoryDaoService.getAllCategories(),
                         personDTO,
                         text);
-                Optional<SubcategoryDTO> subCategoryOptional = CategoryHelper.getSubcategoryByUserInputText(
-                        categoryDaoService.getAllSubcategories(),
-                        personDTO,
-                        text);
-                LinkedHashMap<CommandType, Object> lastCommand = userSessionService.getLastCommand(username);
-                LinkedHashMap<CommandType, Object> firstCommand = userSessionService.getFirstCommand(username);
-                CommandType lastCommandKey = BotCollectionUtils.getKeyFromSingleMap(lastCommand);
-                CommandType firstCommandKey = BotCollectionUtils.getKeyFromSingleMap(firstCommand);
+                CommandType lastCommandKey = BotCollectionUtils.getKeyFromSingleMap(userSessionService.getLastCommand(username));
+                CommandType firstCommandKey = BotCollectionUtils.getKeyFromSingleMap(userSessionService.getFirstCommand(username));
 
                 if (Objects.equals(botConstants.getStartText(), text)) {
                     sendMessage.setReplyMarkup(menuHelper.mainMenu(personDTO));
@@ -119,23 +114,20 @@ public class BotServiceImpl implements BotService {
                     } else
                         sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.INVALID_INPUT_ERROR_TEXT)));
 
-                } else if (Objects.nonNull(firstCommand)
-                        && Objects.nonNull(lastCommand)
-                        && Objects.equals(firstCommandKey, CommandType.ADD_RECORD)
-                        && Objects.equals(lastCommandKey, CommandType.SUBCATEGORY)) {
+                } else if (Objects.equals(firstCommandKey, CommandType.ADD_RECORD) && Objects.equals(lastCommandKey, CommandType.SUBCATEGORY)) {
                     try {
-                        Double amount = Double.parseDouble(text);
-                        userSessionService.saveCommand(username, CommandType.AMOUNT, amount);
-                        sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.AMOUNT_SPENT_TIME_TEXT)));
+                        Double amount = Double.parseDouble(StringUtils.replace(text, " ", ""));
+                        if (Double.compare(amount, 0d) <= 0) {
+                            sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.INVALID_AMOUNT_ERROR_TEXT)));
+                        } else {
+                            userSessionService.saveCommand(username, CommandType.AMOUNT, amount);
+                            sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.AMOUNT_SPENT_TIME_TEXT)));
+                        }
                     } catch (NumberFormatException e) {
                         log.error(e.getMessage());
                         sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.INVALID_AMOUNT_ERROR_TEXT)));
                     }
-                } else if (Objects.nonNull(firstCommand)
-                        && Objects.nonNull(lastCommand)
-                        && Objects.equals(firstCommandKey, CommandType.ADD_RECORD)
-                        && Objects.equals(lastCommandKey, CommandType.AMOUNT)) {
-
+                } else if (Objects.equals(firstCommandKey, CommandType.ADD_RECORD) && Objects.equals(lastCommandKey, CommandType.AMOUNT)) {
                     try {
                         LocalDateTime spentTime = LocalDateTime.of(LocalDate.parse(text, DateTimeFormatter.ofPattern(botConstants.getDateTimePattern())), LocalTime.MIN);
                         userSessionService.saveCommand(username, CommandType.EVENT_TIME, spentTime);
@@ -187,18 +179,27 @@ public class BotServiceImpl implements BotService {
                     sendMessage.setReplyMarkup(menuHelper.currenciesMenu(personDTO));
                     sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.CHOOSE_CURRENCY_TEXT)));
                     userSessionService.saveCommand(username, CommandType.CURRENCY, "currency");
-                } else if (categoryOptional.isPresent()) {
-                    List<SubcategoryDTO> subcategoryDTOList = categoryDaoService.getAllSubcategories()
-                            .stream()
-                            .filter(subcategoryDTO -> Objects.equals(subcategoryDTO.getCategory(), categoryOptional.get().getCategory()))
-                            .collect(Collectors.toList());
-
+                } else if (Objects.equals(firstCommandKey, CommandType.ADD_RECORD) && Objects.equals(lastCommandKey, CommandType.ADD_RECORD) /*&& categoryOptional.isPresent()*/) {
                     sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.CHOOSE_SUBCATEGORY_TEXT)));
-                    sendMessage.setReplyMarkup(menuHelper.subcategoryListMenu(subcategoryDTOList, personDTO));
-                    userSessionService.saveCommand(username, CommandType.CATEGORY, text);
-                } else if (subCategoryOptional.isPresent()) {
-                    userSessionService.saveCommand(username, CommandType.SUBCATEGORY, subCategoryOptional.get().getSubcategory());
-                    sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.SPENT_AMOUNT_TEXT)));
+                    sendMessage.setReplyMarkup(menuHelper.subcategoryListMenu(categoryOptional.get().getSubcategoryDtoList(), personDTO));
+                    UserSessionDTO userSessionDto = userSessionService.getUserSession(username);
+                    userSessionDto.setCategoryDto(categoryOptional.get());
+                    userSessionDto.getCommands().put(CommandType.CATEGORY, text);
+                } else if (Objects.equals(firstCommandKey, CommandType.ADD_RECORD) && Objects.equals(lastCommandKey, CommandType.CATEGORY)) {
+                    UserSessionDTO userSessionDTO = userSessionService.getUserSession(username);
+                    if (Objects.nonNull(userSessionDTO) && Objects.nonNull(userSessionDTO.getCategoryDto())) {
+                        Optional<SubcategoryDTO> subCategoryOptional = CategoryHelper.getSubcategoryByUserInputText(
+                                userSessionDTO.getCategoryDto().getSubcategoryDtoList(),
+                                personDTO,
+                                text);
+
+                        userSessionService.saveCommand(username, CommandType.SUBCATEGORY, subCategoryOptional.get().getSubcategory());
+                        sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.SPENT_AMOUNT_TEXT)));
+                    } else {
+                        sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.COMMANDS_NOT_SAVED_TEXT)));
+                        sendMessage.setReplyMarkup(menuHelper.mainMenu(personDTO));
+                        userSessionService.clearCommands(username);
+                    }
                 } else if (Objects.equals(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.RECORDS_MENU_ITEM)), text)) {
                     sendMessage.setReplyMarkup(menuHelper.recordsMenu(personDTO));
                     sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.RECORDS_MENU_ITEM)));
@@ -218,17 +219,24 @@ public class BotServiceImpl implements BotService {
                         } else {
                             StringBuilder builder = new StringBuilder();
                             PersonDTO p = personDTO;
+                            String currencySign = Objects.nonNull(p.getCurrencyDTO()) ? p.getCurrencyDTO().getSign() : null;
+                            Double[] total = new Double[]{0d};
                             financialControlDtoList.forEach(financialControlDTO -> {
                                 builder.append(
                                         String.format(
                                                 "%s: %s %s",
                                                 LangHelper.getCategoryTextByLang(p.getLanguage(), financialControlDTO.getCategoryDTO()),
                                                 financialControlDTO.getAmount(),
-                                                Objects.nonNull(p.getCurrencyDTO()) ? p.getCurrencyDTO().getSign() : null
+                                                currencySign
                                         )
                                 );
                                 builder.append("\n");
+                                total[0] += financialControlDTO.getAmount();
                             });
+                            builder.append(String.format("%s: %s %s",
+                                    LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.TOTAL_TEXT)),
+                                    total[0],
+                                    currencySign));
                             sendMessage.setText(builder.toString());
                         }
                         sendMessage.setReplyMarkup(menuHelper.mainMenu(personDTO));
@@ -250,17 +258,25 @@ public class BotServiceImpl implements BotService {
                         } else {
                             StringBuilder builder = new StringBuilder();
                             PersonDTO p = personDTO;
+                            Double[] total = new Double[]{0d};
+                            String currencySign = Objects.nonNull(p.getCurrencyDTO()) ? p.getCurrencyDTO().getSign() : null;
                             financialControlDtoList.forEach(financialControlDTO -> {
                                 builder.append(
                                         String.format(
-                                                "%s: %s %s",
+                                                "%s (%s): %s %s",
                                                 LangHelper.getSubcategoryTextByLang(p.getLanguage(), financialControlDTO.getSubcategoryDTO()),
+                                                LangHelper.getCategoryTextByLang(p.getLanguage(), Objects.nonNull(financialControlDTO.getSubcategoryDTO()) ? financialControlDTO.getSubcategoryDTO().getCategoryDTO() : null),
                                                 financialControlDTO.getAmount(),
-                                                Objects.nonNull(p.getCurrencyDTO()) ? p.getCurrencyDTO().getSign() : null
+                                                currencySign
                                         )
                                 );
                                 builder.append("\n");
+                                total[0] += financialControlDTO.getAmount();
                             });
+                            builder.append(String.format("%s: %s %s",
+                                    LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.TOTAL_TEXT)),
+                                    total[0],
+                                    currencySign));
                             sendMessage.setText(builder.toString());
                         }
                         sendMessage.setReplyMarkup(menuHelper.mainMenu(personDTO));
@@ -282,18 +298,26 @@ public class BotServiceImpl implements BotService {
                         } else {
                             StringBuilder builder = new StringBuilder();
                             PersonDTO p = personDTO;
+                            Double[] total = new Double[]{0d};
+                            String currencySign = Objects.nonNull(p.getCurrencyDTO()) ? p.getCurrencyDTO().getSign() : null;
                             financialControlDtoList.forEach(financialControlDTO -> {
                                 builder.append(
                                         String.format(
-                                                "%s: %s %s   %s",
+                                                "%s (%s): %s %s   %s",
                                                 LangHelper.getSubcategoryTextByLang(p.getLanguage(), financialControlDTO.getSubcategoryDTO()),
+                                                LangHelper.getCategoryTextByLang(p.getLanguage(), Objects.nonNull(financialControlDTO.getSubcategoryDTO()) ? financialControlDTO.getSubcategoryDTO().getCategoryDTO() : null),
                                                 financialControlDTO.getAmount(),
-                                                Objects.nonNull(p.getCurrencyDTO()) ? p.getCurrencyDTO().getSign() : null,
+                                                currencySign,
                                                 DateTimeFormatter.ofPattern(botConstants.getDateTimePattern()).format(financialControlDTO.getEventTime())
                                         )
                                 );
                                 builder.append("\n");
+                                total[0] += financialControlDTO.getAmount();
                             });
+                            builder.append(String.format("%s: %s %s",
+                                    LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.TOTAL_TEXT)),
+                                    total[0],
+                                    currencySign));
                             sendMessage.setText(builder.toString());
                         }
                         sendMessage.setReplyMarkup(menuHelper.mainMenu(personDTO));

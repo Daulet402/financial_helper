@@ -15,5 +15,5 @@ public class CategoryDTO {
     private String nameEn;
     private String nameKk;
     private Category category;
-    private List<Subcategory> subcategoryList;
+    private List<SubcategoryDTO> subcategoryDtoList;
 }

@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = BotApplication.class)
 //@ConfigurationProperties("application.properties")
 @PropertySource("classpath:app.datasource.properties")
-public class TestDataSource {
+public class TestClass {
 
     @Autowired
     private DataSource dataSource;
@@ -105,7 +105,7 @@ public class TestDataSource {
     public void testAddSubcategoryDTO() {
         SubcategoryDTO subcategoryDTO = new SubcategoryDTO();
         subcategoryDTO.setSubcategory(Subcategory.BASKETBALL);
-        subcategoryDTO.setCategory(Category.HOUSE);
+       // subcategoryDTO.setCategory(Category.HOUSE);
         subcategoryDTO.setNameRu("это тестовый вызов");
         //categoryDaoService.addSubcategoryDTO(subcategoryDTO);
     }
@@ -113,6 +113,7 @@ public class TestDataSource {
     @Test
     public void testGetAllSubcategories() {
         List<SubcategoryDTO> subcategoryDTOList = categoryDaoService.getAllSubcategories();
+        categoryDaoService.getAllCategories();
         assertTrue(!CollectionUtils.isEmpty(subcategoryDTOList));
 
         StringBuilder builder = new StringBuilder("");

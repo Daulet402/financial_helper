@@ -8,13 +8,8 @@ import java.util.LinkedHashMap;
 @AllArgsConstructor
 @Data
 public class UserSessionDTO {
-    //private String username;
-    //private Double amount;
-    //private LinkedList<CommandDTO> commands;
+    private CategoryDTO categoryDto;
     private LinkedHashMap<CommandType, Object> commands;
-    //private CommandDTO firtsCommand;
-    // private CommandDTO command;
-    // private CommandDTO lastCommand;
 
     public UserSessionDTO() {
         commands = new LinkedHashMap<>();

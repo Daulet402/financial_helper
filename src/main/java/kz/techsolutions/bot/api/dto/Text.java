@@ -27,7 +27,8 @@ public enum Text {
     DATE_RANGE_FOR_RECORDS,
     SETTINGS_MENU_ITEM,
     CURRENCY_MENU_ITEM,
-    NO_RECORDS_FOUND;
+    NO_RECORDS_FOUND,
+    TOTAL_TEXT;
 
     public static Text instance(String key) {
         for (Text text : Text.values()) {
