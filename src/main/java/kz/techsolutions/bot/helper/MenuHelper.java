@@ -97,6 +97,16 @@ public class MenuHelper {
         return subcategoryListMenu;
     }
 
+    public ReplyKeyboardMarkup commentMenu(PersonDTO personDTO) {
+        ReplyKeyboardMarkup menu = new ReplyKeyboardMarkup();
+        menu.setKeyboard(Arrays.asList(
+                setOneButtonRow(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.YES_TEXT))),
+                setOneButtonRow(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.NO_TEXT))),
+                setOneButtonRow(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.BACK_TO_MENU_ITEM)))
+        ));
+        return menu;
+    }
+
     public KeyboardRow setOneButtonRow(String text) {
         KeyboardRow keyboardRow = new KeyboardRow();
         keyboardRow.add(text);

@@ -38,9 +38,9 @@ public class FinancialControlDaoServiceImpl implements FinancialControlDaoServic
 
     private static final String ADD_PERSON_SQL = "INSERT INTO FC.PERSONS(NAME,SURNAME,USERNAME, LANGID) VALUES(?,?,?,?)";
     private static final String UPDATE_PERSON_SQL = "UPDATE FC.PERSONS SET NAME=?, SURNAME=?, LANGID=?, CURRENCY_ID=? WHERE ID=?";
-    private static final String ADD_FC_SQL = "INSERT INTO FC.FINANCIAL_CONTROL(SUBCATEGORYID, EVENTTIME, AMOUNT, INSERTEDTIME, PERSONID) VALUES(?,?,?,TIMESTAMP 'now',?)";
+    private static final String ADD_FC_SQL = "INSERT INTO FC.FINANCIAL_CONTROL(SUBCATEGORYID, EVENTTIME, AMOUNT, INSERTEDTIME, PERSONID, COMMENT) VALUES(?,?,?,TIMESTAMP 'now',?,?)";
     private static final String GET_PERSON_BY_USERNAME_SQL = "SELECT * FROM FC.PERSONS WHERE USERNAME=?";
-    private static final String GET_DETAILED_DATA_SQL = "SELECT fc.id as fc_id,fc.subcategoryid,fc.eventtime,fc.amount,fc.insertedtime,p.* " +
+    private static final String GET_DETAILED_DATA_SQL = "SELECT fc.id as fc_id,fc.subcategoryid,fc.eventtime,fc.amount,fc.insertedtime, fc.comment, p.* " +
             "FROM FC.FINANCIAL_CONTROL fc, FC.PERSONS p " +
             "WHERE fc.personid=p.id AND p.id=? AND eventtime BETWEEN ? AND ?";
 
@@ -64,7 +64,8 @@ public class FinancialControlDaoServiceImpl implements FinancialControlDaoServic
                 Subcategory.getId(Objects.nonNull(financialControlDTO.getSubcategoryDTO()) ? financialControlDTO.getSubcategoryDTO().getSubcategory() : null),
                 DateTimeUtils.toTimestamp(financialControlDTO.getEventTime()),
                 financialControlDTO.getAmount(),
-                Objects.nonNull(financialControlDTO.getPersonDTO()) ? financialControlDTO.getPersonDTO().getId() : null
+                Objects.nonNull(financialControlDTO.getPersonDTO()) ? financialControlDTO.getPersonDTO().getId() : null,
+                financialControlDTO.getComment()
         });
     }
 

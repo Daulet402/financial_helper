@@ -18,6 +18,7 @@ public class FinancialControlDTO {
     private LocalDateTime generatedTime;
     private Double amount;
     private PersonDTO personDTO;
+    private String comment;
 
     @Override
     public String toString() {

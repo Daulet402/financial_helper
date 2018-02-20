@@ -14,4 +14,6 @@ public enum CommandType {
     DETAILED_RECORDS,
     CURRENCY,
     SETTINGS,
+    COMMENT,
+    ADD_COMMENT,
 }

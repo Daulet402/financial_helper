@@ -83,16 +83,19 @@ public class TestClass {
 
     @Test
     public void testAddFcInfo() throws Exception {
+        SubcategoryDTO subcategoryDTO = new SubcategoryDTO();
+        subcategoryDTO.setSubcategory(Subcategory.PLANE);
+
         PersonDTO personDTO = new PersonDTO();
         personDTO.setId(5l);
 
         FinancialControlDTO financialControlDTO = new FinancialControlDTO();
-        financialControlDTO.setAmount(1550.55);
+        financialControlDTO.setAmount(0.65);
         financialControlDTO.setEventTime(LocalDateTime.now().minusDays(25).plusHours(45));
-        //  financialControlDTO.setSubcategory(Subcategory.BASKETBALL);
+        financialControlDTO.setSubcategoryDTO(subcategoryDTO);
         financialControlDTO.setPersonDTO(personDTO);
-
-        // financialControlDaoService.addFcInfo(financialControlDTO);
+        financialControlDTO.setComment(null);
+        financialControlDaoService.addFcInfo(financialControlDTO);
     }
 
     @Test
@@ -167,9 +170,9 @@ public class TestClass {
     @Test
     public void testGetFcInDateRange() {
         List<FinancialControlDTO> financialControlDTOList = financialControlDaoService.getFcDTOListInDateRange(
-                6l,
+                5l,
                 LocalDateTime.of(2017, 12, 01, 0, 0),
-                LocalDateTime.of(2017, 12, 30, 0, 0)
+                LocalDateTime.of(2018, 12, 30, 0, 0)
         );
 
         assertTrue(!CollectionUtils.isEmpty(financialControlDTOList));

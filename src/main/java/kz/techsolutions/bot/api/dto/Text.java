@@ -28,7 +28,11 @@ public enum Text {
     SETTINGS_MENU_ITEM,
     CURRENCY_MENU_ITEM,
     NO_RECORDS_FOUND,
-    TOTAL_TEXT;
+    TOTAL_TEXT,
+    YES_TEXT,
+    NO_TEXT,
+    TYPE_COMMENT_TEXT,
+    ADD_COMMENT_TEXT;
 
     public static Text instance(String key) {
         for (Text text : Text.values()) {
