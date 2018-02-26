@@ -70,7 +70,11 @@ public enum Subcategory {
     CORPORATE(72l),
     HANG_OUT(73l),
     WORK_EVENT(67l),
-    INTO_FAMILY_BUDGET(74l);
+    INTO_FAMILY_BUDGET(74l),
+    CRYPTO_CURRENCIES(75l),
+    TRAVELING(76l),
+    CAR(77l),
+    DWELLING(78l);
 
     @Getter
     private Long id;

@@ -7,3 +7,8 @@ insert into fc.texts(key, text_ru,text_en, text_kk) values('NO_TEXT', 'Нет', 
 insert into fc.texts(key, text_ru,text_en, text_kk) values('TYPE_COMMENT_TEXT', 'Отправьте мне комментарии', 'Type here comment', '');
 insert into fc.texts(key, text_ru,text_en, text_kk) values('ADD_COMMENT_TEXT', 'Хотите ли Вы добавить комментарии ?', 'Would you like to add comments ?', '');
 insert into fc.texts(key, text_ru, text_en, text_kk) values('RECORDS_FOR_TODAY_TEXT', 'На сегодня', 'For today', '');
+insert into fc.category(name, name_ru, id, name_kk, name_en) values('INVESTMENTS', 'Инвестиции', 15, '', 'Investments');
+insert into fc.subcategory(name, categoryid, id, name_ru, name_en, name_kk, color) values ('CRYPTO_CURRENCIES', 15, 75, 'Криптовалюты', 'Crypto currencies', '', '');
+insert into fc.subcategory(name, categoryid, id, name_ru, name_en, name_kk, color) values ('TRAVELING', 15, 76, 'Путешествие', 'Traveling', '', '');
+insert into fc.subcategory(name, categoryid, id, name_ru, name_en, name_kk, color) values ('CAR', 15, 77, 'Автомобиль', 'Car', '', '');
+insert into fc.subcategory(name, categoryid, id, name_ru, name_en, name_kk, color) values ('DWELLING', 15, 78, 'Жилье', 'Dwelling', '', '');

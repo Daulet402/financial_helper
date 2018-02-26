@@ -20,7 +20,8 @@ public enum Category {
     COSMETICS(12l),
     WORK(13l),
     LOAN(14l),
-    OTHER(79l);
+    OTHER(79l),
+    INVESTMENTS(15l);
 
     @Getter
     private Long id;
