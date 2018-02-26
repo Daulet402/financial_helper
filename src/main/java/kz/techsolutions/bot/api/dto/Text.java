@@ -32,7 +32,8 @@ public enum Text {
     YES_TEXT,
     NO_TEXT,
     TYPE_COMMENT_TEXT,
-    ADD_COMMENT_TEXT;
+    ADD_COMMENT_TEXT,
+    RECORDS_FOR_TODAY_TEXT;
 
     public static Text instance(String key) {
         for (Text text : Text.values()) {

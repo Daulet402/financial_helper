@@ -6,3 +6,4 @@ insert into fc.texts(key, text_ru,text_en, text_kk) values('YES_TEXT', 'Да', '
 insert into fc.texts(key, text_ru,text_en, text_kk) values('NO_TEXT', 'Нет', 'No', '');
 insert into fc.texts(key, text_ru,text_en, text_kk) values('TYPE_COMMENT_TEXT', 'Отправьте мне комментарии', 'Type here comment', '');
 insert into fc.texts(key, text_ru,text_en, text_kk) values('ADD_COMMENT_TEXT', 'Хотите ли Вы добавить комментарии ?', 'Would you like to add comments ?', '');
+insert into fc.texts(key, text_ru, text_en, text_kk) values('RECORDS_FOR_TODAY_TEXT', 'На сегодня', 'For today', '');

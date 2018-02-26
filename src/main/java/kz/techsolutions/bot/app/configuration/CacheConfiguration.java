@@ -49,7 +49,7 @@ public class CacheConfiguration {
         return new GuavaCache(
                 "textDto",
                 CacheBuilder.newBuilder()
-                        .maximumSize(20)
+                        .maximumSize(50)
                         .expireAfterWrite(48, TimeUnit.HOURS)
                         .build()
         );

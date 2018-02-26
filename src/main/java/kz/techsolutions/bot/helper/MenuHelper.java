@@ -67,6 +67,7 @@ public class MenuHelper {
                 setOneButtonRow(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDTOByKey(Text.CATEGORY_RECORDS_MENU_ITEM.name()))),
                 setOneButtonRow(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDTOByKey(Text.SUBCATEGORY_RECORDS_MENU_ITEM.name()))),
                 setOneButtonRow(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDTOByKey(Text.DETAILED_RECORDS_MENU_ITEM.name()))),
+                setOneButtonRow(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDTOByKey(Text.RECORDS_FOR_TODAY_TEXT.name()))),
                 setOneButtonRow(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.BACK_TO_MENU_ITEM)))
         ));
         return menu;

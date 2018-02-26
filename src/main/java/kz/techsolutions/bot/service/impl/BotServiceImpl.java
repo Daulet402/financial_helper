@@ -61,8 +61,6 @@ public class BotServiceImpl implements BotService {
     public SendMessage processAndGetSendMessage(Update update) throws BotAppException {
         Long chatId = getChatId(update);
         String username = "";
-        // TODO: 12/27/17 Add possibility to comment
-        // TODO: 2/10/18 Hide menu while waiting user input
         try {
             if (Objects.nonNull(update.getMessage())) {
                 SendMessage sendMessage = new SendMessage();
@@ -282,6 +280,12 @@ public class BotServiceImpl implements BotService {
                 } else if (Objects.equals(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.DETAILED_RECORDS_MENU_ITEM)), text)) {
                     sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.DATE_RANGE_FOR_RECORDS)));
                     userSessionService.saveCommand(username, CommandType.DETAILED_RECORDS, text);
+                } else if (Objects.equals(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.RECORDS_FOR_TODAY_TEXT)), text)) {
+                    LocalDateTime startTime = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+                    LocalDateTime endTime = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+                    setDetailedRecordsToMessage(personDTO, sendMessage, startTime, endTime);
+                    sendMessage.setReplyMarkup(menuHelper.mainMenu(personDTO));
+                    userSessionService.clearCommands(username);
                 } else if (Objects.equals(firstCommandKey, CommandType.DETAILED_RECORDS)) {
                     String[] timeRange = text.split("-");
                     if (timeRange.length != 2) {
@@ -289,35 +293,7 @@ public class BotServiceImpl implements BotService {
                     } else {
                         LocalDateTime startTime = DateTimeUtils.parseLocalDateTime(timeRange[0], botConstants.getDateTimePattern());
                         LocalDateTime endTime = DateTimeUtils.parseLocalDateTime(timeRange[1], botConstants.getDateTimePattern());
-                        List<FinancialControlDTO> financialControlDtoList = financialControlDaoService.getFcDTOListInDateRange(personDTO.getId(), startTime, endTime);
-                        if (CollectionUtils.isEmpty(financialControlDtoList)) {
-                            sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.NO_RECORDS_FOUND)));
-                        } else {
-                            StringBuilder builder = new StringBuilder();
-                            PersonDTO p = personDTO;
-                            Double[] total = new Double[]{0d};
-                            String currencySign = Objects.nonNull(p.getCurrencyDTO()) ? p.getCurrencyDTO().getSign() : null;
-                            financialControlDtoList.forEach(financialControlDTO -> {
-                                builder.append(
-                                        String.format(
-                                                "%s (%s): %s%s %s %s",
-                                                LangHelper.getSubcategoryTextByLang(p.getLanguage(), financialControlDTO.getSubcategoryDTO()),
-                                                LangHelper.getCategoryTextByLang(p.getLanguage(), Objects.nonNull(financialControlDTO.getSubcategoryDTO()) ? financialControlDTO.getSubcategoryDTO().getCategoryDTO() : null),
-                                                financialControlDTO.getAmount(),
-                                                currencySign,
-                                                DateTimeFormatter.ofPattern(botConstants.getDateTimePattern()).format(financialControlDTO.getEventTime()),
-                                                StringUtils.defaultIfEmpty(financialControlDTO.getComment(), "")
-                                        )
-                                );
-                                builder.append("\n");
-                                total[0] += financialControlDTO.getAmount();
-                            });
-                            builder.append(String.format("%s: %s%s",
-                                    LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.TOTAL_TEXT)),
-                                    total[0],
-                                    currencySign));
-                            sendMessage.setText(builder.toString());
-                        }
+                        setDetailedRecordsToMessage(personDTO, sendMessage, startTime, endTime);
                         sendMessage.setReplyMarkup(menuHelper.mainMenu(personDTO));
                         userSessionService.clearCommands(username);
                     }
@@ -354,6 +330,37 @@ public class BotServiceImpl implements BotService {
         } else {
             sendMessage.setText(LangHelper.getTextByLang(personDTO.getLanguage(), textService.getTextDtoMap().get(Text.COMMANDS_NOT_SAVED_TEXT)));
             sendMessage.setReplyMarkup(menuHelper.mainMenu(personDTO));
+        }
+    }
+
+    private void setDetailedRecordsToMessage(PersonDTO p, SendMessage sendMessage, LocalDateTime startTime, LocalDateTime endTime) {
+        List<FinancialControlDTO> financialControlDtoList = financialControlDaoService.getFcDTOListInDateRange(p.getId(), startTime, endTime);
+        if (CollectionUtils.isEmpty(financialControlDtoList)) {
+            sendMessage.setText(LangHelper.getTextByLang(p.getLanguage(), textService.getTextDtoMap().get(Text.NO_RECORDS_FOUND)));
+        } else {
+            StringBuilder builder = new StringBuilder();
+            Double[] total = new Double[]{0d};
+            String currencySign = Objects.nonNull(p.getCurrencyDTO()) ? p.getCurrencyDTO().getSign() : null;
+            financialControlDtoList.forEach(financialControlDTO -> {
+                builder.append(
+                        String.format(
+                                "%s (%s): %s%s %s %s",
+                                LangHelper.getSubcategoryTextByLang(p.getLanguage(), financialControlDTO.getSubcategoryDTO()),
+                                LangHelper.getCategoryTextByLang(p.getLanguage(), Objects.nonNull(financialControlDTO.getSubcategoryDTO()) ? financialControlDTO.getSubcategoryDTO().getCategoryDTO() : null),
+                                financialControlDTO.getAmount(),
+                                currencySign,
+                                DateTimeFormatter.ofPattern(botConstants.getDateTimePattern()).format(financialControlDTO.getEventTime()),
+                                StringUtils.defaultIfEmpty(financialControlDTO.getComment(), "")
+                        )
+                );
+                builder.append("\n");
+                total[0] += financialControlDTO.getAmount();
+            });
+            builder.append(String.format("%s: %s%s",
+                    LangHelper.getTextByLang(p.getLanguage(), textService.getTextDtoMap().get(Text.TOTAL_TEXT)),
+                    total[0],
+                    currencySign));
+            sendMessage.setText(builder.toString());
         }
     }
 }
